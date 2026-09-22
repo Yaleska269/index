@@ -125,13 +125,12 @@
     <script>
 
         // =====================================================
-        //                            URL 
+        // URL DEL BACKEND
         // =====================================================
 
-        const BACKEND_URL = 'https://backend-gatos-8zff.onrender.com';
+        const BACKEND_URL = "https://backend-gatos-8zff.onrender.com";
 
 
-     
         const formGato = document.getElementById("formGato");
         const gatoId = document.getElementById("gatoId");
         const nombre = document.getElementById("nombre");
@@ -140,18 +139,11 @@
         const raza = document.getElementById("raza");
         const imagen = document.getElementById("imagen");
         const preview = document.getElementById("preview");
-
         const btnGuardar = document.getElementById("btnGuardar");
         const btnCancelar = document.getElementById("btnCancelar");
-
-        const tituloFormulario =
-            document.getElementById("tituloFormulario");
-
-        const resultado =
-            document.getElementById("resultado");
-
-        const listaGatos =
-            document.getElementById("listaGatos");
+        const tituloFormulario = document.getElementById("tituloFormulario");
+        const resultado = document.getElementById("resultado");
+        const listaGatos = document.getElementById("listaGatos");
 
 
         // =====================================================
@@ -198,6 +190,7 @@
 
 
                 // Si hay una imagen seleccionada
+
                 if (imagen.files.length > 0) {
 
                     formData.append("imagen", imagen.files[0]);
@@ -219,7 +212,9 @@
                         }
                     );
 
+
                     const data = await response.json();
+
 
                     if (!response.ok) {
 
@@ -229,13 +224,15 @@
 
                     }
 
+
                     resultado.innerHTML = `
-                    <div class="alert alert-success">
-                        ${data.mensaje}
-                    </div>
-                `;
+                        <div class="alert alert-success">
+                            ${data.mensaje}
+                        </div>
+                    `;
 
                 }
+
 
                 // =================================================
                 // SI NO EXISTE ID = REGISTRAR
@@ -244,15 +241,17 @@
                 else {
 
                     // En el registro la imagen es obligatoria
+
                     if (imagen.files.length === 0) {
 
                         resultado.innerHTML = `
-                        <div class="alert alert-danger">
-                            La imagen del gato es obligatoria.
-                        </div>
-                    `;
+                            <div class="alert alert-danger">
+                                La imagen del gato es obligatoria.
+                            </div>
+                        `;
 
                         return;
+
                     }
 
 
@@ -264,7 +263,9 @@
                         }
                     );
 
+
                     const data = await response.json();
+
 
                     if (!response.ok) {
 
@@ -274,11 +275,12 @@
 
                     }
 
+
                     resultado.innerHTML = `
-                    <div class="alert alert-success">
-                        ${data.mensaje}
-                    </div>
-                `;
+                        <div class="alert alert-success">
+                            ${data.mensaje}
+                        </div>
+                    `;
 
                 }
 
@@ -287,16 +289,15 @@
 
                 cargarGatos();
 
-
             } catch (error) {
 
                 console.error(error);
 
                 resultado.innerHTML = `
-                <div class="alert alert-danger">
-                    ${error.message}
-                </div>
-            `;
+                    <div class="alert alert-danger">
+                        ${error.message}
+                    </div>
+                `;
 
             }
 
@@ -312,10 +313,10 @@
             try {
 
                 listaGatos.innerHTML = `
-                <div class="text-center">
-                    Cargando gatos...
-                </div>
-            `;
+                    <div class="text-center">
+                        Cargando gatos...
+                    </div>
+                `;
 
 
                 const response = await fetch(
@@ -323,34 +324,48 @@
                 );
 
 
-                const gatos = await response.json();
+                // IMPORTANTE:
+                // El backend devuelve:
+                // { mensaje: "...", gatos: [...] }
+
+                const data = await response.json();
 
 
                 if (!response.ok) {
 
                     throw new Error(
-                        gatos.mensaje || "Error al obtener los gatos"
+                        data.mensaje || "Error al obtener los gatos"
                     );
 
                 }
 
 
+                // Aquí obtenemos el arreglo de gatos
+
+                const gatos = data.gatos;
+
+
                 listaGatos.innerHTML = "";
 
 
-                if (gatos.length === 0) {
+                if (!gatos || gatos.length === 0) {
 
                     listaGatos.innerHTML = `
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            No hay gatos registrados.
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                No hay gatos registrados.
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
 
                     return;
+
                 }
 
+
+                // =================================================
+                // MOSTRAR CADA GATO
+                // =================================================
 
                 gatos.forEach(gato => {
 
@@ -365,43 +380,41 @@
 
 
                     card.innerHTML = `
+                        <div class="card shadow p-3">
 
-                    <div class="card shadow p-3">
+                            <img
+                                src="${imagenUrl}"
+                                class="gato-img mb-3"
+                                alt="${gato.nombre}"
+                                onerror="this.src='https://placehold.co/400x300?text=Sin+Imagen'"
+                            >
 
-                        <img
-                            src="${imagenUrl}"
-                            class="gato-img mb-3"
-                            alt="${gato.nombre}"
-                            onerror="this.src='https://placehold.co/400x300?text=Sin+Imagen'"
-                        >
+                            <h4>${gato.nombre}</h4>
 
-                        <h4>${gato.nombre}</h4>
+                            <p>
+                                <strong>Edad:</strong>
+                                ${gato.edad} años
+                            </p>
 
-                        <p>
-                            <strong>Edad:</strong>
-                            ${gato.edad} años
-                        </p>
+                            <p>
+                                <strong>Peso:</strong>
+                                ${gato.peso} kg
+                            </p>
 
-                        <p>
-                            <strong>Peso:</strong>
-                            ${gato.peso} kg
-                        </p>
+                            <p>
+                                <strong>Raza:</strong>
+                                ${gato.raza}
+                            </p>
 
-                        <p>
-                            <strong>Raza:</strong>
-                            ${gato.raza}
-                        </p>
+                            <button
+                                class="btn btn-warning w-100"
+                                onclick='editarGato(${JSON.stringify(gato)})'
+                            >
+                                ✏️ Editar
+                            </button>
 
-                        <button
-                            class="btn btn-warning w-100"
-                            onclick='editarGato(${JSON.stringify(gato)})'
-                        >
-                            ✏️ Editar
-                        </button>
-
-                    </div>
-
-                `;
+                        </div>
+                    `;
 
 
                     listaGatos.appendChild(card);
@@ -414,13 +427,17 @@
                 console.error(error);
 
                 listaGatos.innerHTML = `
-                <div class="col-12">
-                    <div class="alert alert-danger">
-                        Error al cargar los gatos:
-                        ${error.message}
+                    <div class="col-12">
+
+                        <div class="alert alert-danger">
+
+                            Error al cargar los gatos:
+                            ${error.message}
+
+                        </div>
+
                     </div>
-                </div>
-            `;
+                `;
 
             }
 
@@ -445,7 +462,9 @@
 
             btnGuardar.textContent = "Actualizar Gato";
 
+
             btnGuardar.classList.remove("btn-primary");
+
             btnGuardar.classList.add("btn-warning");
 
 
@@ -455,6 +474,7 @@
             if (gato.imagenUrl) {
 
                 preview.src = gato.imagenUrl;
+
                 preview.style.display = "block";
 
             }
@@ -490,18 +510,18 @@
             gatoId.value = "";
 
             preview.src = "";
+
             preview.style.display = "none";
 
 
-            tituloFormulario.textContent =
-                "Registrar Gato";
+            tituloFormulario.textContent = "Registrar Gato";
 
 
-            btnGuardar.textContent =
-                "Registrar Gato";
+            btnGuardar.textContent = "Registrar Gato";
 
 
             btnGuardar.classList.remove("btn-warning");
+
             btnGuardar.classList.add("btn-primary");
 
 
